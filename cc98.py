@@ -27,7 +27,7 @@ with open('head.pickle','rb')as f:
     loghead=pickle.load(f)
 
 
-url=input()
+url=input('enter the url\n')
 rpNum=int(input("用多少个马甲\n"))
 rpNum=min(rpNum,len(passwds))
 logurl='http://www.cc98.org/sign.asp'

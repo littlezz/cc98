@@ -1,7 +1,5 @@
 import httplib2 as ht2
-#from urllib.parse import urlencode
-#from urllib.parse import urlparse
-#import urllib.parse
+
 from urllib.parse import *
 import urllib.parse
 from bs4 import BeautifulSoup as bs
@@ -45,7 +43,6 @@ def req(url,head):
     dt=(mt,bdid)
     reurl=rpbase+urlencode(dt)
     print(reurl)
-    print('ok')
     return reurl,BdidRtid[1][1],fu
 
 def reply(head,url,pd,rtid,fu,username):
@@ -64,9 +61,9 @@ def reply(head,url,pd,rtid,fu,username):
     print(random.choice(contents))
     h=ht2.Http('.cache')
     req,u=h.request(url,"POST",headers=head,body=urlencode(contentForm))
-    print(req)
     
-    print('rep')
+    
+    
     
 """    
 #
