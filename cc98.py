@@ -1,49 +1,73 @@
-#!python3
+__author__ = 'zz'
+
+from requests import Session
+from hashlib import md5
 
 
-"""
-passwd==password
-pd==passwd (in Cookie)
 
-no cookie record Ver
-"""
-
-import Lib.logrp as logrp
-import pickle
-import os
-os.chdir('data')
-
-with open('username.txt',encoding="utf-8") as f:
-    usernames=[]
-    for i in f:
-        usernames.append(i.rstrip())
-
-with open('password.txt',encoding="utf-8") as f:
-    passwds=[]
-    for i in f:
-        passwds.append(i.rstrip())
-
-with open('head.pickle','rb')as f:
-    loghead=pickle.load(f)
+###################
+LOGIN_URL = 'http://www.cc98.org/sign.asp'
+CC98_URL = 'http://www.cc98.org'
 
 
-url=input('enter the url\n')
-rpNum=int(input("用多少个马甲\n"))
-rpNum=min(rpNum,len(passwds))
-logurl='http://www.cc98.org/sign.asp'
 
-for i in range(rpNum):
-    username=usernames[i]
-    passwd=passwds[i]
+#########################
+class CC98User(Session):
 
-    head,pd=logrp.login(username,passwd,logurl,loghead)
-    head["Accept"]="text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"
-    head["Content-Type"]="application/x-www-form-urlencoded"
-    
-    reurl,rtid,fu=logrp.req(url,head)
-    logrp.reply(head,reurl,pd,rtid,fu,username)
-    print('over')
 
-    
+
+    def __init__(self, username=None, passwd=None, usernamefile=None, passwdfile=None, replies=None):
+        """
+        :param username: string
+        :param passwd: string
+        :param usernamefile: filelike obj
+        :param passwdfile: filelike obj
+        :param replies: filelike obj or list like obj
+        """
+        # python3
+        super().__init__()
+        self.usernames = []
+        self.passwds = []
+        self._can_login = True
+        if usernamefile and passwdfile:
+            for username_ , passwd_ in zip(usernamefile,passwdfile):
+                self.usernames.append(username_)
+                self.passwds.append(passwd_)
+        elif username and passwd:
+            self.usernames.append(username)
+            self.passwds.append(passwd)
+        else:
+            self._can_login = False
+
+        self.replies = replies if replies else None
+
+        if self._can_login:
+            self._login()
+
+    def _login(self):
+        self.scan(CC98_URL)
+        for username, passwd in zip(self.usernames, self.passwds):
+            md5_passwd = md5(passwd.encode()).hexdigest()
+            post_form = {
+                'a': 'i',
+                'u': username,
+                'p': md5_passwd,
+                'userhidden': '2',
+            }
+
+
+
+
+
+
+    def scan(self, url):
+        return self.get(url)
+
+    def reply(self, url, reply=None):
+        """
+        :param reply: will use this reply instead of self.replies
+        :return: if success return True, else return False
+        """
+        pass
 
 
