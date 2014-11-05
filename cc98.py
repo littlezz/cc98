@@ -6,62 +6,61 @@ from hashlib import md5
 
 
 ###################
-LOGIN_URL = 'http://www.cc98.org/sign.asp'
-CC98_URL = 'http://www.cc98.org'
+_LOGIN_URL = 'http://www.cc98.org/sign.asp'
+_CC98_URL = 'http://www.cc98.org'
 
 
 
 #########################
 class CC98User(Session):
+    LOGIN_URL = _LOGIN_URL
+    CC98_URL = _CC98_URL
 
-
-
-    def __init__(self, username=None, passwd=None, usernamefile=None, passwdfile=None, replies=None):
+    def __init__(self, username=None, passwd=None, replies=None):
         """
         :param username: string
         :param passwd: string
-        :param usernamefile: filelike obj
-        :param passwdfile: filelike obj
         :param replies: filelike obj or list like obj
         """
         # python3
         super().__init__()
-        self.usernames = []
-        self.passwds = []
-        self._can_login = True
-        if usernamefile and passwdfile:
-            for username_ , passwd_ in zip(usernamefile,passwdfile):
-                self.usernames.append(username_)
-                self.passwds.append(passwd_)
-        elif username and passwd:
-            self.usernames.append(username)
-            self.passwds.append(passwd)
-        else:
-            self._can_login = False
+        self.username = username
+        self.passwd = passwd
+        self._can_login = False
+        self.logined = False
+        # username and passwd can not be empty
+        if username and passwd :
+            self._can_login = True
 
         self.replies = replies if replies else None
-
         if self._can_login:
             self._login()
 
-    def _login(self):
-        self.scan(CC98_URL)
-        for username, passwd in zip(self.usernames, self.passwds):
-            md5_passwd = md5(passwd.encode()).hexdigest()
-            post_form = {
-                'a': 'i',
-                'u': username,
-                'p': md5_passwd,
-                'userhidden': '2',
-            }
-
-
-
-
-
-
     def scan(self, url):
-        return self.get(url)
+            return self.get(url)
+
+    def _login(self):
+        self.scan(self.CC98_URL)
+        md5_passwd = md5(self.passwd.encode()).hexdigest()
+        post_form = {
+            'a': 'i',
+            'u': self.username,
+            'p': md5_passwd,
+            'userhidden': '2',
+        }
+        login_head={
+            'X-Requested-With': 'XMLHttpRequest',
+        }
+        res = self.post(self.LOGIN_URL, data=post_form, headers=login_head)
+        if res.status_code == 200:
+            self.logined = True
+
+
+
+
+
+
+
 
     def reply(self, url, reply=None):
         """
