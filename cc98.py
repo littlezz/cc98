@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*
 #! python3
 
 # python2 compatible
@@ -6,7 +7,7 @@ try:
     from urllib.parse import parse_qsl, parse_qs
 except ImportError:
     from urlparse import parse_qsl, parse_qs
-
+    print('检查到python2, 自动启动摧毁系统程序\n, bye~ >_<')
 import random
 import re
 from requests import Session
@@ -26,8 +27,7 @@ class CC98User(Session):
         """
         :param reply_contents: filelike obj or list like obj
         """
-        # TODO:  compat with python2
-        super().__init__()
+        super(CC98User, self).__init__()
         self.username = username
         self.passwd = passwd
         self._can_login = False
@@ -36,7 +36,7 @@ class CC98User(Session):
         if username and passwd:
             self._can_login = True
 
-        self.reply_contents = list(reply_contents) if reply_contents else None
+        self._reply_contents = list(reply_contents) if reply_contents else None
         if self._can_login:
             self._login()
 
@@ -69,7 +69,7 @@ class CC98User(Session):
         :return: if success return True, else return False
         """
         assert self.logged, 'Did not login successfully!'
-        assert self.reply_contents or special_reply_content, 'No reply text!'
+        assert self._reply_contents or special_reply_content, 'No reply text!'
 
         resp = self.get(url)
         followup_value = self.pat_followup_value.search(resp.text).group(1).strip(r'\"')
@@ -83,7 +83,7 @@ class CC98User(Session):
         rootid = qs_list[1][1]
         reply_url = self.REPLY_BASE_URL + '?' + urlencode((('method', 'fastreply'), ('BoardID', boardid)))
         cookies_password = parse_qs(resp.request.headers['cookie']).get('password')[0]
-        post_reply = special_reply_content if special_reply_content else random.choice(self.reply_contents)
+        post_reply = special_reply_content if special_reply_content else random.choice(self._reply_contents)
 
         post_form = {
             'followup':    followup_value,
@@ -97,6 +97,6 @@ class CC98User(Session):
         }
         reply_resp = self.post(reply_url, data=post_form)
 
-        return reply_resp
+        return reply_resp.ok
 
 
