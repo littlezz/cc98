@@ -100,5 +100,3 @@ class CC98User(Session):
         return reply_resp
 
 
-user = CC98User(username,passwd, ['2333','hhhhh'])
-user.reply(cc98_url)
