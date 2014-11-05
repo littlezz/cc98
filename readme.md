@@ -17,11 +17,29 @@ compat with python 2.7+
 Quickstart
 --------------------
 
-```python3
+simple use  
+```python
 from cc98 import CC98User
-user = CC98User(username,passwd, ['2333', 'hhhhh'])
+user = CC98User(your_username,your_passwd, ['2333', 'hhhhh'])
 user.reply(cc98_url)
 ```
+
+use file like object:  
+
+```python
+from cc98 import CC98User
+with open('relpy_contents.txt')as f:
+    user = CC98User(your_username,your_passwd, f)
+user.reply(cc98_url)
+```
+
+Those will random choose a content to post
+
+You can also special assign a reply:    
+```python
+user.reply(cc98_url, 'your reply')
+```
+
 Enjoy!  
 
 To Do
