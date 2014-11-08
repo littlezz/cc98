@@ -120,11 +120,26 @@ def user_flow(usernames=None, passwds=None, reply_contents_=None):
             user = CC98User(username, passwd, reply_contents)
             users.append(user)
         except AssertionError:
-            print(username,passwd, 'can not loggin')
+            print(username, passwd, 'can not loggin')
 
     def reply_flow(reply_url):
         for user in users:
-            user.reply(reply_url)
+            response_status = user.reply(reply_url)
+            print(user.username, response_status)
 
     return reply_flow
 
+if __name__ == '__main__':
+    from os.path import join
+
+    def get_path(filename):
+        return join('users_info', filename)
+
+    users = []
+    with open(get_path('usernames.txt')) as fnames, open(get_path('passwords.txt'))as fpasswds, open(get_path('resp.txt')) as fresp:
+        users_reply = user_flow(fnames, fpasswds, fresp)
+
+    with open(get_path('url.txt')) as furl:
+        url = furl.read().strip()
+
+    users_reply(url)

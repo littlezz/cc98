@@ -41,10 +41,23 @@ user.reply(cc98_url, 'your reply')
 ```
 
 users stream reply:  
-```
+```python
 user_stream_reply = user_flow(usernames,passwds,reply_contents)
 user_stream_reply(url)
 ```
+
+### 主程序运行时 ###
+除了API,当cc98.py 作为主程序运行时,自动获得users_info 目录下的文件内容.
+
+举例, 在users_info/usernames.txt  
+```
+username1
+username2
+```
+
+在url.txt添加相应的url  
+
+* * *
 
 Enjoy!  
 
