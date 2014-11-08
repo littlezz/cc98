@@ -40,12 +40,18 @@ You can also special assign a reply:
 user.reply(cc98_url, 'your reply')
 ```
 
+users stream reply:  
+```
+user_stream_reply = user_flow(usernames,passwds,reply_contents)
+user_stream_reply(url)
+```
+
 Enjoy!  
 
 To Do
 ------------
 - reply---------------->done
-- user strea
+- user stream --------->done
 - compat with python2  ------------>done
 - main
 
@@ -54,3 +60,5 @@ update
 - 登陆成功 ----------------->11-5
 - 回复帖子成功 --------------> 11-5 , 17:11
 - 兼容python2 --------------> 11-5 , 23:17
+- 用户流回复 ----------------> 11-8
+

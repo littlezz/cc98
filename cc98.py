@@ -32,7 +32,7 @@ class CC98User(Session):
         self.passwd = passwd
         self._can_login = False
         self.logged = False
-        # username and passwd can not be empty
+
         if username and passwd:
             self._can_login = True
 
@@ -40,6 +40,7 @@ class CC98User(Session):
         if self._can_login:
             self._login()
 
+        assert self.logged, 'Not login successfully!'
     def scan(self, url):
             return self.get(url)
 
@@ -53,8 +54,10 @@ class CC98User(Session):
             'userhidden': '2',
         }
         login_head = {'X-Requested-With': 'XMLHttpRequest'}
-        res = self.post(self.LOGIN_URL, data=post_form, headers=login_head)
-        if res.ok:
+        self._login_res = self.post(self.LOGIN_URL, data=post_form, headers=login_head)
+
+        # cc98 is too ....
+        if self._login_res.text == '9898':
             self.logged = True
 
         self.headers.update({
@@ -95,8 +98,33 @@ class CC98User(Session):
             'Content':     post_reply,
             'signflag':    'yes',
         }
-        reply_resp = self.post(reply_url, data=post_form)
+        self._reply_resp = self.post(reply_url, data=post_form)
 
-        return reply_resp.ok
 
+        return self._reply_resp.ok
+
+
+def user_flow(usernames=None, passwds=None, reply_contents_=None):
+    """
+    usage:
+        user_stream_reply = user_flow(usernames,passwds,reply_contents)
+        user_stream_reply(url)
+
+    """
+    reply_contents = list(reply_contents_)
+    users = []
+    for username, passwd in zip(usernames, passwds):
+        try:
+            username = username.strip()
+            passwd = passwd.strip()
+            user = CC98User(username, passwd, reply_contents)
+            users.append(user)
+        except AssertionError:
+            print(username,passwd, 'can not loggin')
+
+    def reply_flow(reply_url):
+        for user in users:
+            user.reply(reply_url)
+
+    return reply_flow
 
