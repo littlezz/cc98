@@ -23,26 +23,23 @@ class CC98User(Session):
     REPLY_BASE_URL = 'http://www.cc98.org/SaveReAnnounce.asp'
     pat_followup_value = re.compile(r'<input.*?followup.*?((?<=value=).*?)>')
 
-    def __init__(self, username=None, passwd=None, reply_contents=None):
+    def __init__(self, username, passwd, reply_contents=None):
         """
         :param reply_contents: filelike obj or list like obj
         """
         super(CC98User, self).__init__()
         self.username = username
         self.passwd = passwd
-        self._can_login = False
         self.logged = False
-
-        if username and passwd:
-            self._can_login = True
-
         self._reply_contents = list(reply_contents) if reply_contents else None
-        if self._can_login:
-            self._login()
+        self._login()
 
         assert self.logged, 'Not login successfully!'
+
     def scan(self, url):
-            return self.get(url)
+        """return Response"""
+
+        return self.get(url)
 
     def _login(self):
         self.scan(self.CC98_URL)
@@ -99,7 +96,6 @@ class CC98User(Session):
             'signflag':    'yes',
         }
         self._reply_resp = self.post(reply_url, data=post_form)
-
 
         return self._reply_resp.ok
 
